@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sohangiz uchun soliq imtiyozlari</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=Unbounded:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: one column. Sector picker on top, a count line as the answer, then a ledger of benefit cards. */
+:root{
+  --bg:#F4EEE3;
+  --surface:#FFFFFF;
+  --ink:#1B2A4A;
+  --muted:#5E6A82;
+  --line:#DDD3C1;
+  --accent:#EF4C4F;
+  --navy:#1B2A4A;
+  --on-navy:#F4EEE3;
+  --blue:#004D86;
+  --tag-bg:#E8DCC8;
+  --warn-bg:#FBEFD6;
+  --warn-ink:#6B4A0C;
+  --font-display:"Unbounded","Onest",system-ui,sans-serif;
+  --font-body:"Onest",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#10192E;--surface:#1B2A4A;--ink:#F1EADC;--muted:#A7B1C6;--line:#33456B;
+    --accent:#FF6669;--navy:#0B1222;--on-navy:#F1EADC;--blue:#7FB6E6;
+    --tag-bg:#2C3D63;--warn-bg:#3A311B;--warn-ink:#F0D595;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#10192E;--surface:#1B2A4A;--ink:#F1EADC;--muted:#A7B1C6;--line:#33456B;
+  --accent:#FF6669;--navy:#0B1222;--on-navy:#F1EADC;--blue:#7FB6E6;
+  --tag-bg:#2C3D63;--warn-bg:#3A311B;--warn-ink:#F0D595;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:680px;margin:0 auto;padding:28px 18px 40px;display:flex;flex-direction:column;gap:18px}
+.brand{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.brand b{font-weight:700;color:var(--blue);font-size:17px;letter-spacing:-.01em}
+h1{font-family:var(--font-display);font-weight:700;font-size:clamp(22px,6vw,30px);line-height:1.2;margin:6px 0 0;text-wrap:balance;letter-spacing:-.01em}
+h1 em{font-style:normal;color:var(--accent)}
+h2{font-size:18px;line-height:1.3;margin:0;text-wrap:balance}
+.lead{margin:8px 0 0;color:var(--muted);max-width:52ch}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px}
+.picker h2{margin-bottom:12px;font-size:15px}
+.sectors{display:flex;flex-wrap:wrap;gap:8px}
+.sectors button{font:500 14px var(--font-body);color:var(--ink);background:transparent;border:1px solid var(--line);border-radius:999px;padding:8px 14px;cursor:pointer;text-align:left}
+.sectors button:hover{border-color:var(--ink)}
+.sectors button[aria-pressed="true"]{background:var(--navy);color:var(--on-navy);border-color:var(--navy);font-weight:600}
+button:focus-visible,.cta:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.answer{background:var(--navy);color:var(--on-navy);border-radius:14px;padding:20px 18px}
+.answer p{margin:0;font-size:14px;opacity:.85}
+.answer .big{font-family:var(--font-display);font-weight:700;font-size:clamp(22px,6.5vw,30px);line-height:1.2;margin:4px 0 6px;overflow-wrap:anywhere}
+.list{display:flex;flex-direction:column;gap:12px}
+.item{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.item.common{border-left-color:var(--blue)}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:12px;font-weight:600;background:var(--tag-bg);color:var(--ink);border-radius:6px;padding:3px 8px}
+.item h3{margin:0;font-size:17px;line-height:1.35;text-wrap:balance}
+.item dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:14px}
+.item dt{color:var(--muted);white-space:nowrap}
+.item dd{margin:0;min-width:0;overflow-wrap:anywhere}
+.check{font-size:13px;background:var(--warn-bg);color:var(--warn-ink);border-radius:8px;padding:7px 10px}
+.section-title{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-top:8px}
+.section-title span{font-size:13px;color:var(--muted)}
+.note{font-size:13px;color:var(--muted);margin:0}
+.note ul{margin:6px 0 0;padding-left:18px}
+.note li{margin-bottom:4px}
+.cta-box{display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+.cta-box p{margin:0;color:var(--muted);font-size:14px}
+.cta{display:inline-block;background:var(--accent);color:#fff;font-weight:700;text-decoration:none;border-radius:10px;padding:13px 20px}
+.cta:hover{filter:brightness(.94)}
+footer{text-align:center;font-size:12px;color:var(--muted);padding-top:6px}
+footer b{color:var(--blue)}
+@media (max-width:420px){.item dl{grid-template-columns:1fr}.item dt{margin-top:4px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><b>fintrust</b><span>Muazzam Sayidumarova kurslari</span></div>
+
+  <header>
+    <h1>Sizning sohangizda <em>qanday soliq imtiyozlari</em> bor?</h1>
+    <p class="lead">Faoliyat turingizni tanlang. 2026-yilda amalda bo'lgan imtiyozlar, ularning shartlari va muddati chiqadi.</p>
+  </header>
+
+  <section class="card picker">
+    <h2 id="pick-label">Faoliyat turingiz</h2>
+    <div class="sectors" id="sectors" role="group" aria-labelledby="pick-label"></div>
+  </section>
+
+  <section class="answer" aria-live="polite">
+    <p id="ansSector"></p>
+    <div class="big" id="ansCount"></div>
+    <p>Pastda har birining sharti va muddati yozilgan.</p>
+  </section>
+
+  <div class="list" id="list"></div>
+
+  <div class="section-title">
+    <h2>Barcha sohalar uchun</h2>
+    <span>Faoliyat turidan qat'i nazar</span>
+  </div>
+  <div class="list" id="common"></div>
+
+  <div class="note">
+    Ma'lumot 2026-yil 14-noyabr holatiga ko'ra tuzilgan va umumiy tanishish uchun.
+    <ul>
+      <li>Deyarli har bir imtiyozning sharti bor: tushum ulushi, ish haqi darajasi, litsenziya yoki rezidentlik. Shart bajarilmasa, imtiyoz qo'llanmaydi.</li>
+      <li>Qo'llashdan oldin hujjatning amaldagi tahririni lex.uz saytida tekshiring yoki buxgalteringiz bilan maslahatlashing.</li>
+    </ul>
+  </div>
+
+  <section class="card cta-box">
+    <h2>Qaysi imtiyoz aynan sizning firmangizga to'g'ri keladi?</h2>
+    <p>Fintrust buni hujjatlaringizga qarab tekshirib beradi. Telegramda yozing: @muazzam_muradjanovna</p>
+    <a class="cta" href="https://t.me/muazzam_muradjanovna" target="_blank" rel="noopener">Telegramda yozish</a>
+  </section>
+
+  <footer><b>fintrust</b> · Muazzam Sayidumarova kurslari · Instagram: @muazzam_buxgalter</footer>
+</div>
+
+<script>
+(function(){
+  var SIMPLE_VAT = {
+    tax:["QQS","Foyda solig'i"],
+    title:"Soddalashtirilgan QQS: 6% va foyda solig'i 0%",
+    who:"Asosiy faoliyati savdo, umumiy ovqatlanish yoki xizmat ko'rsatish bo'lgan tadbirkorlar. O'tish ixtiyoriy.",
+    cond:"Sotib olingan tovar va xizmatlar bo'yicha to'langan QQS hisobga olinmaydi. Davlat ulushi 50% va undan yuqori korxonalar hamda yirik soliq to'lovchilarga berilmaydi.",
+    period:"2026-yil 1-iyundan 2030-yil 1-yanvargacha",
+    basis:"PF-100, 26.05.2026"
+  };
+  var ADJ_RENT = {
+    tax:["Ijara to'lovi"],
+    title:"Tutash hudud ijarasi yer solig'ining bir baravari miqdorida",
+    who:"Savdo, umumiy ovqatlanish va xizmat ko'rsatish obyektlari.",
+    cond:"Bino va yer uchastkasiga tutash hududdan foydalanilganda.",
+    period:"2026-yil 1-iyundan",
+    basis:"PF-100, 26.05.2026"
+  };
+  var SECTORS = [
+    {id:"savdo", name:"Savdo", items:[
+      SIMPLE_VAT, ADJ_RENT,
+      {tax:["Eslatma"], title:"Elektron savdo uchun pasaytirilgan stavkalar bekor qilingan",
+       who:"Onlayn platformalar orqali sotuvchilar.",
+       cond:"2026-yildan foyda solig'i 15% (oldin 10%), aylanmadan olinadigan soliq 4% (oldin 3%).",
+       period:"2026-yil 1-yanvardan", basis:"O'RQ-1108, 25.12.2025"}
+    ]},
+    {id:"ovqat", name:"Umumiy ovqatlanish", items:[
+      SIMPLE_VAT,
+      {tax:["QQS"], title:"To'langan QQSning 40% gacha qismi qaytariladi",
+       who:"Umumiy soliq rejimida ishlayotgan umumiy ovqatlanish korxonalari.",
+       cond:"Naqd pulsiz to'lovlar ulushidan qat'i nazar. Soddalashtirilgan 6% rejimga o'tganlarga qo'llanmaydi.",
+       period:"2026-yil 1-iyundan", basis:"PF-100, 26.05.2026"},
+      ADJ_RENT
+    ]},
+    {id:"xizmat", name:"Xizmat ko'rsatish", items:[ SIMPLE_VAT, ADJ_RENT ]},
+    {id:"turizm", name:"Mehmonxona va turizm", items:[
+      {tax:["Mol-mulk solig'i","Yer solig'i"], title:"Stavkalarga 0,1 koeffitsiyent: soliq 10 baravar kam",
+       who:"Mehmonxonalar va boshqa joylashtirish vositalari.",
+       cond:"Hujjatda ko'rsatilgan shartlar asosida.",
+       period:"2030-yil 1-yanvargacha",
+       basis:"Prezident farmoni, 2026-yil avgust",
+       check:"Farmon raqami va sanasini lex.uz dan tekshiring."},
+      {tax:["QQS"], title:"Chet ellik turistlarga xizmatlar uchun QQS 0%",
+       who:"O'zbekiston rezidenti bo'lgan turoperatorlar.",
+       cond:"Chet ellik turistlarga ko'rsatilgan xizmatlar bo'yicha.",
+       period:"2027-yil 1-yanvardan",
+       basis:"Prezident farmoni, 2026-yil avgust",
+       check:"Hali kuchga kirmagan. Raqamini lex.uz dan tekshiring."},
+      {tax:["Bojxona boji"], title:"Avtobus, elektrobus va mikroavtobus importi bojdan ozod",
+       who:"Turizm subyektlari.", cond:"Turistik transport olib kirilganda.",
+       period:"2028-yil 1-yanvargacha", basis:"Prezident farmoni, 2026-yil avgust"},
+      SIMPLE_VAT
+    ]},
+    {id:"it", name:"IT va dasturlash", items:[
+      {tax:["Foyda solig'i","QQS","Ijtimoiy soliq","Aylanma solig'i"], title:"IT Park rezidentlari to'rt soliqdan ozod",
+       who:"IT Park rezidenti maqomini olgan IT-kompaniyalar va IT o'quv markazlari.",
+       cond:"Rezidentlik shartlariga rioya qilish va hisobot topshirish. Buzilsa, maqom bekor qilinadi va soliqlar tiklanadi.",
+       period:"2028-yil 1-yanvargacha", basis:"IT Park ma'lumoti"},
+      {tax:["JShDS"], title:"Xodimlar daromad solig'i 12% o'rniga 7,5%",
+       who:"IT Park rezidentlarining xodimlari.",
+       cond:"Rezident bilan tuzilgan mehnat shartnomasi bo'yicha ish haqi.",
+       period:"Amalda", basis:"IT Park ma'lumoti"},
+      {tax:["Soliq va bojxona"], title:"Eksportchi IT-kompaniyalar uchun imtiyozlar 2040-yilgacha",
+       who:"Daromadining 50% dan ortig'ini xorijdan oladigan rezidentlar va IT-ta'lim markazlari.",
+       cond:"QQS bu uzaytirishga kirmaydi.",
+       period:"2040-yil 1-yanvargacha", basis:"IT Park ma'lumoti"}
+    ]},
+    {id:"tikuv", name:"Tikuv, poyabzal, charm", items:[
+      {tax:["Foyda solig'i","Ijtimoiy soliq"], title:"Foyda solig'i 2%, ijtimoiy soliq 1%",
+       who:"Tikuv-trikotaj, poyabzal va charm-attorlik mahsulotlari ishlab chiqaruvchilar.",
+       cond:"Bir nechta shart bir vaqtda bajarilishi kerak: soha mahsulotidan tushum ulushi, ish haqi darajasi va xodimlar tarkibi. Shartlar chorakning har oyida bajarilsa, imtiyoz shu chorakka qo'llanadi.",
+       period:"2025-yil 1-yanvardan 2028-yil 1-yanvargacha", basis:"PF-229, 27.12.2024",
+       check:"Tushum ulushi sharti manbalarda har xil (90% va 70%). Amaldagi tahrirni tekshiring."},
+      {tax:["Ijtimoiy soliq"], title:"To'qimachilik korxonalari uchun ijtimoiy soliq 1%",
+       who:"Paxta-to'qimachilik klasterlari, to'qimachilik va tikuv-trikotaj korxonalari.",
+       cond:"Hujjatda ko'rsatilgan tartibda.",
+       period:"2025-yil 1-sentabrdan 2028-yil 1-sentabrgacha", basis:"PQ-290, 19.09.2025"}
+    ]},
+    {id:"qishloq", name:"Qishloq xo'jaligi", items:[
+      {tax:["QQS"], title:"O'zi yetishtirgan mahsulotni sotishda QQS 0%",
+       who:"Qishloq xo'jaligi tovar ishlab chiqaruvchilari.",
+       cond:"Paxta va g'alla kirmaydi. Mahsulot tasdiqlangan ro'yxatda bo'lishi kerak (516 tur). Xaridlar bo'yicha to'langan QQS qaytariladi.",
+       period:"2026-yil 1-yanvardan", basis:"PF-153, 04.09.2025"},
+      {tax:["Foyda solig'i"], title:"O'z mahsulotidan olingan foydaga 0% stavka",
+       who:"Qishloq xo'jaligi tovar ishlab chiqaruvchilari.",
+       cond:"O'zi yetishtirgan mahsulotdan olingan foyda bo'yicha.",
+       period:"Muddatsiz", basis:"Soliq kodeksi, 337-modda"},
+      {tax:["Ijtimoiy soliq"], title:"Issiqxona xo'jaliklari uchun ijtimoiy soliq 1%",
+       who:"Issiqxona xo'jaliklari.",
+       cond:"Shu faoliyatdan daromad jami daromadning kamida 60% bo'lsa.",
+       period:"2026-yil 1-yanvardan 2029-yil 1-yanvargacha", basis:"PF-181, 08.10.2025"},
+      {tax:["Foyda solig'i","Ijtimoiy soliq"], title:"Qadoqlangan meva-sabzavot sotuvchilar: ikkala soliq 1%",
+       who:"Zamonaviy qadoqlangan meva-sabzavot mahsulotlarini sotuvchi tadbirkorlar.",
+       cond:"O'rtacha ish haqi MHTEKMning kamida 2 baravari; shu mahsulotdan tushum kamida 50%.",
+       period:"2025-yil 1-maydan 2028-yil 1-yanvargacha", basis:"PQ-136, 08.04.2025"},
+      {tax:["Ijtimoiy soliq","JShDS"], title:"Yangi kooperativlar: xodimlar uchun ikkala soliq 1%",
+       who:"Qishloq xo'jaligi va dorivor o'simliklar yetishtirish, qayta ishlash bo'yicha yangi tashkil etilgan kooperativlar.",
+       cond:"Hujjatda ko'rsatilgan tartibda.",
+       period:"2025-yil 1-apreldan 2028-yil 1-yanvargacha", basis:"PQ-12, 17.01.2025"},
+      {tax:["QQS"], title:"Chorvachilik va parrandachilik: to'langan QQSning 50% qaytariladi",
+       who:"Chorvachilik va parrandachilik xo'jaliklari.",
+       cond:"Go'sht, sut va tuxum sotishdan tushum jami daromadning kamida 90% bo'lishi kerak. Budjetga to'langan QQSning 50% har oyning 25-sanasigacha qaytariladi.",
+       period:"2025-yil 1-apreldan 2028-yil 1-yanvargacha", basis:"PQ-34, 30.01.2025",
+       check:"2026-yildan o'z mahsulotingizga QQS 0% qo'llansa, qaytariladigan summa kichik bo'lishi mumkin."}
+    ]},
+    {id:"talim", name:"Ta'lim", items:[
+      {tax:["Barcha soliqlar"], title:"Xususiy bog'cha va maktablar ijtimoiy soliqdan boshqa barcha soliqlardan ozod",
+       who:"Nodavlat maktabgacha va umumiy o'rta ta'lim tashkilotlari.",
+       cond:"Ijtimoiy soliq to'lanadi. Chet ellik o'qituvchi va mutaxassislar JShDS va ijtimoiy soliq to'lamaydi.",
+       period:"2030-yil 1-yanvargacha", basis:"Prezident qarori, 2024-yil noyabr",
+       check:"Qaror raqamini lex.uz dan tekshiring."},
+      {tax:["Ijtimoiy soliq"], title:"Yangi xususiy bog'chalar: ijtimoiy soliq 1% yoki 5%",
+       who:"Kamida 150 o'rinli nodavlat bog'cha tashkil etgan tadbirkorlar.",
+       cond:"Bog'cha qamrovi 70% dan past tumanlarda 1%, 70-80% oralig'ida 5%. Litsenziya olingandan keyin 3 yil. Toshkent shahri kirmaydi. Yangi ko'p kvartirali uylarning 1-qavatidagi bog'chalar uchun barcha hududlarda 5%.",
+       period:"2026-yil 1-apreldan 2030-yil 1-yanvargacha", basis:"PF-19, 05.02.2026"},
+      {tax:["Foyda solig'i"], title:"Ta'lim xizmatlari bo'yicha foyda solig'i 0%",
+       who:"Ijtimoiy sohada faoliyat yurituvchi soliq to'lovchilar, jumladan ta'lim xizmati ko'rsatuvchilar.",
+       cond:"Qaysi xizmatlar ijtimoiy sohaga kirishi Soliq kodeksining 59-moddasida yozilgan.",
+       period:"Muddatsiz", basis:"Soliq kodeksi, 337 va 59-moddalar",
+       check:"O'quv markazingiz xizmati 59-modda ro'yxatiga tushishini tekshiring."}
+    ]},
+    {id:"tibbiyot", name:"Tibbiyot", items:[
+      {tax:["Foyda solig'i"], title:"Tibbiy xizmatlar bo'yicha foyda solig'i 0%",
+       who:"Litsenziya asosida tibbiy xizmat ko'rsatuvchi tibbiyot tashkilotlari.",
+       cond:"Kosmetologiya xizmatlari kirmaydi. Tibbiy buyumlarni sterilizatsiya qilish kabi yondosh faoliyatga ham qo'llanmaydi.",
+       period:"Muddatsiz", basis:"Soliq kodeksi, 337 va 59-moddalar"}
+    ]},
+    {id:"elektro", name:"Elektrotexnika", items:[
+      {tax:["Foyda solig'i","Mol-mulk solig'i"], title:"Yuqori texnologiyali ishlab chiqarish: foyda solig'i 0% va mol-mulk solig'idan ozod",
+       who:"Yuqori texnologiyali ishlab chiqarishni joriy etgan elektrotexnika korxonalari.",
+       cond:"Foyda solig'i faqat yuqori texnologiyali mahsulotdan olingan daromad qismida. Mol-mulk solig'i shu obyektlar bo'yicha.",
+       period:"Obyekt foydalanishga qabul qilingan sanadan 3 yil", basis:"PQ-20, 22.01.2025"}
+    ]},
+    {id:"sanoat", name:"Sanoat ishlab chiqarish", items:[
+      {tax:["Ijtimoiy soliq"], title:"Ijtimoiy soliq bazasi xodimlar transporti va ovqati xarajatiga kamayadi",
+       who:"Oziq-ovqat, qurilish materiallari, farmatsevtika, mebel, kimyo, ipakchilik, elektrotexnika, parfyumeriya-kosmetika, avtomobil va metallurgiya korxonalari; shuningdek o'zi ishlab chiqargan mahsulot tushumning 60% dan ortig'ini tashkil etadigan soliq to'lovchilar.",
+       cond:"Har bir xodimga oyiga 1 BHM gacha. O'rtacha ish haqi MHTEKMning kamida 2 baravari bo'lishi kerak.",
+       period:"2026-yil 1-yanvardan 2028-yil 1-yanvargacha", basis:"PQ-295, 04.10.2025"},
+      {tax:["Yer qa'ri solig'i"], title:"Gips qazib olish bo'yicha soliq stavkasi 50%",
+       who:"Gipsni o'z ehtiyoji uchun qazib olib, undan qurilish materiali ishlab chiqaruvchilar.",
+       cond:"Faqat o'z ehtiyoji uchun qazib olingan qism bo'yicha.",
+       period:"2026-yil 1-yanvardan 2028-yil 1-yanvargacha", basis:"PQ-295, 04.10.2025"}
+    ]},
+    {id:"mebel", name:"Mebel", items:[
+      {tax:["QQS"], title:"Texnologik uskuna sotishda QQS faqat ustamadan hisoblanadi",
+       who:"Import qilingan texnologik uskunani mahalliy mebel ishlab chiqaruvchilarga sotuvchi distribyutorlar.",
+       cond:"Soliq bazasi: sotish narxi bilan sotib olish narxi orasidagi farq.",
+       period:"2030-yil 1-yanvargacha", basis:"PQ-193, 27.05.2025"},
+      {tax:["Bojxona boji"], title:"Xomashyo va butlovchi qismlar importiga boj 1%",
+       who:"Mebel ishlab chiqaruvchilar.",
+       cond:"Mebel ishlab chiqarishda foydalaniladigan xomashyo, material va butlovchi qismlar.",
+       period:"Hujjatda ko'ring", basis:"PQ-193, 27.05.2025",
+       check:"Muddat va tovarlar ro'yxatini hujjatdan tekshiring."},
+      {tax:["Ijtimoiy soliq"], title:"Ijtimoiy soliq bazasi xodimlar transporti va ovqati xarajatiga kamayadi",
+       who:"Mebel sanoati korxonalari.",
+       cond:"Har bir xodimga oyiga 1 BHM gacha. O'rtacha ish haqi MHTEKMning kamida 2 baravari.",
+       period:"2026-yil 1-yanvardan 2028-yil 1-yanvargacha", basis:"PQ-295, 04.10.2025"}
+    ]},
+    {id:"zargar", name:"Zargarlik", items:[
+      {tax:["QQS"], title:"QQS faqat qo'shilgan qismdan hisoblanadi",
+       who:"Zargarlik buyumlari ishlab chiqaruvchilar.",
+       cond:"Soliq bazasi: buyum narxi bilan undagi qimmatbaho metall va toshlar qiymati orasidagi farq. Oldingi QQS imtiyozlari 2026-yildan bekor qilingan.",
+       period:"2028-yil 1-yanvargacha", basis:"O'RQ-1108, 25.12.2025"}
+    ]},
+    {id:"zaryad", name:"Elektromobil quvvatlash", items:[
+      {tax:["Mol-mulk solig'i","Yer solig'i"], title:"Hisoblangan soliqning atigi 1% to'lanadi",
+       who:"Elektromobillarni quvvatlash xizmatini ko'rsatuvchilar.",
+       cond:"Quvvatlash stansiyalari bo'yicha.",
+       period:"2028-yil 1-yanvargacha", basis:"PQ-444, 19.12.2022"},
+      {tax:["Foyda solig'i","Aylanma solig'i"], title:"Quvvatlash daromadi soliqdan ozod",
+       who:"Elektromobillarni quvvatlash xizmatini ko'rsatuvchilar.",
+       cond:"Foyda solig'idan ozod bo'lish uchun quvvatlash daromadi jami daromadning kamida 50% bo'lishi kerak. Aylanma solig'ida bu daromad bazadan chiqariladi.",
+       period:"2028-yil 1-yanvargacha", basis:"PQ-444, 19.12.2022"}
+    ]},
+    {id:"kontent", name:"Kino va bolalar kontenti", items:[
+      {tax:["Foyda solig'i","Ijtimoiy soliq"], title:"Foyda solig'idan ozod, ijtimoiy soliq 1%",
+       who:"Bolalar kontenti yaratuvchilar; milliy film va serial ishlab chiqaruvchilar.",
+       cond:"Shu faoliyatdan daromad yillik jami tushumning kamida 80% bo'lishi kerak.",
+       period:"Bolalar kontenti: 2025-yil 1-iyuldan; film va seriallar: 2026-yil 1-yanvardan. Ikkalasi 2030-yil 1-yanvargacha",
+       basis:"PQ-183, 15.05.2025"}
+    ]}
+  ];
+  var COMMON = [
+    {tax:["Aylanma solig'i"], title:"Yakka tartibdagi tadbirkorlar uchun aylanmadan soliq 1%",
+     who:"Yillik aylanmasi 1 mlrd so'mgacha bo'lgan YaTTlar.",
+     cond:"Bazaviy stavka 4%.", period:"2026-yil 1-yanvardan", basis:"O'RQ-1108, 25.12.2025"},
+    {tax:["Soliq rejimi"], title:"QQS va foyda solig'iga o'tish chegarasi 5 baravar oshdi",
+     who:"Aylanmadan olinadigan soliq to'lovchilar.",
+     cond:"Chegara BHMning 12 000 baravari, ya'ni taxminan 5 mlrd so'm (oldin 1 mlrd so'm edi).",
+     period:"2026-yil 1-iyundan", basis:"PF-100, 26.05.2026"},
+    {tax:["Foyda solig'i"], title:"QQSga ilk bor o'tganlar 1 yil foyda solig'idan ozod",
+     who:"Aylanmadan olinadigan soliqdan QQS va foyda solig'iga birinchi marta o'tgan tadbirkorlar.",
+     cond:"Dividend va foiz daromadlariga qo'llanmaydi. Qayta tashkil etilgan korxonalarga berilmaydi.",
+     period:"2026-yil 1-yanvardan", basis:"Soliq kodeksi, 337-modda"},
+    {tax:["QQS","Mol-mulk solig'i"], title:"Buxgalter yoki autsorsing xarajati soliqdan chegiriladi",
+     who:"Aylanmadan olinadigan soliqdan QQS va foyda solig'iga birinchi marta o'tgan tadbirkorlar.",
+     cond:"6 oy davomida, oyiga MHTEKMning 3,5 baravarigacha. Buxgalter mehnat shartnomasi bilan yollangan yoki buxgalteriya firmasi bilan shartnoma tuzilgan bo'lishi kerak. Rahbar hisobni o'zi yuritsa, berilmaydi.",
+     period:"2026-yil 1-yanvardan 2030-yil 1-yanvargacha", basis:"O'RQ-1108, 25.12.2025"},
+    {tax:["Foyda solig'i"], title:"Nogironligi bo'lgan xodimlar uchun stavka kamayadi",
+     who:"Barcha foyda solig'i to'lovchilar.",
+     cond:"Nogironligi bo'lgan xodimlar o'rtacha yillik sonning 3% dan oshgan har bir foizi uchun stavka 1 foiz punktga kamayadi.",
+     period:"Muddatsiz", basis:"Soliq kodeksi, 337-modda"}
+  ];
+
+  function el(tag, cls, text){ var e=document.createElement(tag); if(cls) e.className=cls; if(text!=null) e.textContent=text; return e; }
+  function row(dl, k, v){ dl.appendChild(el('dt', null, k)); dl.appendChild(el('dd', null, v)); }
+  function card(it, common){
+    var c = el('article', 'item' + (common ? ' common' : ''));
+    var tags = el('div', 'tags');
+    it.tax.forEach(function(t){ tags.appendChild(el('span', 'tag', t)); });
+    c.appendChild(tags);
+    c.appendChild(el('h3', null, it.title));
+    var dl = el('dl');
+    row(dl, 'Kimga', it.who);
+    row(dl, 'Sharti', it.cond);
+    row(dl, 'Muddati', it.period);
+    row(dl, 'Asos', it.basis);
+    c.appendChild(dl);
+    if (it.check) c.appendChild(el('div', 'check', 'Tekshiring: ' + it.check));
+    return c;
+  }
+  var list = document.getElementById('list'), box = document.getElementById('sectors');
+  function show(id){
+    var s = SECTORS.filter(function(x){ return x.id === id; })[0] || SECTORS[0];
+    Array.prototype.forEach.call(box.children, function(b){ b.setAttribute('aria-pressed', b.dataset.id === s.id ? 'true' : 'false'); });
+    list.textContent = '';
+    s.items.forEach(function(it){ list.appendChild(card(it, false)); });
+    var n = s.items.filter(function(it){ return it.tax[0] !== 'Eslatma'; }).length;
+    document.getElementById('ansSector').textContent = s.name + ' sohasi uchun';
+    document.getElementById('ansCount').textContent = n + ' ta sohaviy imtiyoz va ' + COMMON.length + ' ta umumiy';
+  }
+  SECTORS.forEach(function(s){
+    var b = el('button', null, s.name); b.type = 'button'; b.dataset.id = s.id;
+    b.addEventListener('click', function(){ show(s.id); });
+    box.appendChild(b);
+  });
+  var common = document.getElementById('common');
+  COMMON.forEach(function(it){ common.appendChild(card(it, true)); });
+  show('savdo');
+})();
+</script>
+</body>
+</html>
